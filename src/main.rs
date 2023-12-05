@@ -92,17 +92,14 @@ impl Maps {
             let mut outside = Vec::new();
             for seed in seeds.into_iter() {
                 let res = map.txs(seed);
-                match res.lo {
-                    Some(s) => outside.push(s),
-                    None => (),
+                if let Some(s) = res.lo {
+                    outside.push(s)
                 };
-                match res.tx {
-                    Some(s) => mapped.push(s),
-                    None => (),
+                if let Some(s) = res.tx {
+                    mapped.push(s)
                 };
-                match res.hi {
-                    Some(s) => outside.push(s),
-                    None => (),
+                if let Some(s) = res.hi {
+                    outside.push(s)
                 };
             }
             seeds = outside;
@@ -157,6 +154,7 @@ impl Seed {
 }
 
 fn main() {
+    let parse_start = Instant::now();
     let input_raw = fs::read_to_string("./input/day05_input.txt").expect("input file");
     let mut input_split = input_raw.split("\n\n");
 
@@ -170,7 +168,9 @@ fn main() {
     let mut seed_iter = seeds
         .split_whitespace()
         .filter_map(|x| x.parse::<isize>().ok());
+
     let mut p2_seeds = Vec::new();
+
     while let Some(seed) = seed_iter.next() {
         p2_seeds.push(Seed {
             lo: seed,
@@ -187,6 +187,8 @@ fn main() {
             m
         })
         .collect();
+
+    println!("Parsing input - {:?}", parse_start.elapsed());
 
     let p1_start = Instant::now();
 
