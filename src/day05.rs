@@ -154,6 +154,7 @@ impl Seed {
 }
 
 pub fn day05() {
+    println!("\nDay 05");
     let parse_start = Instant::now();
     let input_raw = fs::read_to_string("./input/day05_input.txt").expect("input file");
     let mut input_split = input_raw.split("\n\n");
