@@ -32,6 +32,6 @@ pub fn day06() {
 
     let part02 = count_strategy(60808676, 601116315591300);
 
-    println!("Part 01: {}", part01);
-    println!("Part 02: {}", part02);
+    println!("Part 1 - No. winning strategies: {}", part01);
+    println!("Part 2 - No. of winning strategies: {}", part02);
 }

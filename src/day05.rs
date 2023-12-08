@@ -156,7 +156,7 @@ impl Seed {
 pub fn day05() {
     println!("\nDay 05");
     let parse_start = Instant::now();
-    let input_raw = fs::read_to_string("./input/day05_input.txt").expect("input file");
+    let input_raw = fs::read_to_string("../input/day05.txt").expect("input file");
     let mut input_split = input_raw.split("\n\n");
 
     let seeds = input_split.next().unwrap();
@@ -200,7 +200,7 @@ pub fn day05() {
         .expect("minimum value");
 
     println!(
-        "Part 01 - {:?}\n  Lowest numbered location: {}",
+        "Part 1 - {:?}\n  Lowest numbered location: {}",
         p1_start.elapsed(),
         min_loc
     );
@@ -216,7 +216,7 @@ pub fn day05() {
         .expect("minimum value");
 
     println!(
-        "Part 02 - {:?}\n  Lowest numbered location: {}",
+        "Part 2 - {:?}\n  Lowest numbered location: {}",
         p2_start.elapsed(),
         p2_min_loc
     );
