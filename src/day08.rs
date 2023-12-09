@@ -1,10 +1,7 @@
-#![allow(unused_imports)]
-#![allow(unused_variables)]
-#![allow(dead_code)]
-
+use std::cmp::Ordering;
 use std::collections::HashMap;
 use std::fs::File;
-use std::io::{self, BufRead, BufReader};
+use std::io::{BufRead, BufReader};
 
 fn parse_line(text: &str) -> (&str, &str, &str) {
     let mut p = text
@@ -16,9 +13,9 @@ fn parse_line(text: &str) -> (&str, &str, &str) {
     (key, l, r)
 }
 
-fn walk_zzz(path: &str, map: &HashMap<String, (String, String)>) -> usize {
+fn walk_z(path: &str, map: &HashMap<String, (String, String)>, start: &str) -> usize {
     let mut steps = 0;
-    let mut loc = "AAA";
+    let mut loc = start;
 
     for c in path.chars().cycle() {
         let choice = map.get(loc).unwrap();
@@ -30,7 +27,7 @@ fn walk_zzz(path: &str, map: &HashMap<String, (String, String)>) -> usize {
         };
 
         steps += 1;
-        if loc == "ZZZ" {
+        if loc.ends_with('Z') {
             break;
         }
     }
@@ -71,45 +68,9 @@ fn walk_n<'a>(
     loc
 }
 
-//This function works but is too slow on full input.
-fn parallel_walk(path: &str, map: &HashMap<String, (String, String)>) -> usize {
-    let mut steps = 0;
-    let mut loc: Vec<&str> = map
-        .keys()
-        .filter(|x| x.ends_with('A'))
-        .map(|x| x.as_str())
-        .collect();
-
-    for c in path.chars().cycle() {
-        loc = loc
-            .iter()
-            .map(|x| {
-                let choice = map.get(*x).unwrap();
-
-                if c == 'L' {
-                    &choice.0
-                } else {
-                    &choice.1
-                }
-            })
-            .map(|x| x.as_str())
-            .filter(|x| x != &"ZZZ")
-            .collect();
-
-        steps += 1;
-        if loc.iter().all(|x| x.ends_with('Z')) || loc.len() == 0 {
-            break;
-        }
-        if steps >= 1000000 {
-            break;
-        }
-    }
-    steps
-}
-
-fn ghost_map<'a>(
+fn ghost_map(
     path: &str,
-    map: &'a HashMap<String, (String, String)>,
+    map: &HashMap<String, (String, String)>,
     n: usize,
 ) -> HashMap<String, String> {
     let mut g_map = HashMap::new();
@@ -163,6 +124,30 @@ fn remap_gmap(map: &HashMap<String, String>, n: usize) -> HashMap<String, String
     remap
 }
 
+fn gcd(a: usize, b: usize) -> usize {
+    match a.cmp(&b) {
+        Ordering::Equal => a,
+        Ordering::Less => {
+            if a == 0 {
+                b
+            } else {
+                gcd(a, b % a)
+            }
+        }
+        Ordering::Greater => {
+            if b == 0 {
+                a
+            } else {
+                gcd(a % b, b)
+            }
+        }
+    }
+}
+
+fn lcm(a: usize, b: usize) -> usize {
+    a * b / gcd(a, b)
+}
+
 pub fn day08() {
     let input_file = File::open("../input/day08.txt").expect("input file");
     let input_buffer = BufReader::new(input_file);
@@ -181,7 +166,7 @@ pub fn day08() {
         }
     });
 
-    let az_steps = walk_zzz(&path, &map);
+    let az_steps = walk_z(&path, &map, "AAA");
 
     let g_map = ghost_map(&path, &map, az_steps);
 
@@ -195,6 +180,19 @@ pub fn day08() {
     let ghost_steps = walk_ghost(&g_map);
 
     println!("\nDay 08\nPart 1 - Total steps: {}", az_steps);
-    println!("Part 2 - Total steps: {}", az_steps * 2491 * 71 * 61 * 67);
+    println!(
+        "Part 2 - Total steps: {}",
+        az_steps * 2491 * 71 * 61 * 67 * ghost_steps
+    );
+
+    //after looking at reddit
+    let z_period: Vec<usize> = map
+        .keys()
+        .filter(|x| x.ends_with('A'))
+        .map(|x| walk_z(&path, &map, x.as_str()))
+        .collect();
+
+    let better_part2 = z_period.iter().fold(z_period[0], |acc, x| lcm(acc, *x));
+    println!("Better Part 2: {}", better_part2);
 }
 
