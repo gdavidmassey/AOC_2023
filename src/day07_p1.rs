@@ -124,7 +124,7 @@ pub fn day07_p1() {
 
 #[cfg(Test)]
 
-mod test {
+mod tests {
     use super::*;
 
     #[Test]
